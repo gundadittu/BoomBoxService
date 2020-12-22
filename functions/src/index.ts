@@ -4,7 +4,7 @@ import * as functions from 'firebase-functions';
 // import * as serviceAccount from './credentials/serviceAccountKey.json';
 
 // import { setLinkedStreamingAccountForUser } from './functionHandlers/linkedStreamingAccountsHandler';
-import { fetchAppleMusicUserLibrarySongs } from './streaming/appleMusic';
+import { AppleMusicAPI } from './appleMusic/appleMusicAPI';
 
 // https://firebase.google.com/docs/reference/admin/node?authuser=0
 // https://firebase.google.com/docs/reference/functions?authuser=0
@@ -45,6 +45,10 @@ import { fetchAppleMusicUserLibrarySongs } from './streaming/appleMusic';
 
 // exports.setLinkedStreamingAccountForUser = setLinkedStreamingAccountForUser
 
-exports.fetchAppleMusicUserLibrarySongs = functions.https.onCall(async (data, context) => {
-    return fetchAppleMusicUserLibrarySongs(data.accessToken);
+exports.fetchAppleMusicUserLibrarySongs = functions.https.onCall(async (data, _) => {
+    return AppleMusicAPI.fetchUserLibrarySongs(data.accessToken);
+}); 
+
+exports.fetchAppleMusicCatalogDataForSongs = functions.https.onCall(async (data, _) => {
+    return AppleMusicAPI.fetchCatalogDataForSongs(data.catalogIds);
 }); 
