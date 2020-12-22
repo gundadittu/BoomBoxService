@@ -87,7 +87,6 @@ export class AppleMusicAPI {
                 // TODO: log this error and include log details on what type validation failed + song data 
             }
         }
-        console.log("Catalog ids list: "+JSON.stringify(dev_catalog_id_list));
         return allSongs;
     }
 
