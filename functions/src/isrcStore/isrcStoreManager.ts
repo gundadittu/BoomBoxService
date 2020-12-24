@@ -1,4 +1,4 @@
-import { Firebase, ErrorManager } from '../index';
+import { Firebase, ErrorManager, Logger } from '../index';
 import * as firestoreConstants from '../constants/firestoreConstants';
 import {
     AppleMusicCatalogSong,
@@ -14,6 +14,8 @@ export { };
 export class IsrcStoreManager {
 
     static storeAppleMusicCatalogSongsIntoIsrcStore = async (appleMusicCatalogSongs: Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong>): Promise<Array<IsrcStoreItem>> => {
+        Logger.info("storeAppleMusicCatalogSongsIntoIsrcStore() inputs:", {appleMusicCatalogSongs: appleMusicCatalogSongs})
+        
         var allNewIsrcStoreItems: Array<IsrcStoreItem> = [];
         for (var currSong of appleMusicCatalogSongs) {
             if (validateAppleMusicCatalogSong(currSong)) {
@@ -69,6 +71,8 @@ export class IsrcStoreManager {
             }
             return allChunks;
         }
+
+        Logger.info("storeAppleMusicCatalogSongsIntoIsrcStore() output:", {allNewIsrcStoreItems: allNewIsrcStoreItems})
 
         let newIsrcItemChunks: Array<Array<IsrcStoreItem>> = splitNewIsrcStoreItems(allNewIsrcStoreItems);
         for (const chunk of newIsrcItemChunks) {

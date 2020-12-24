@@ -1,5 +1,5 @@
 
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import {
     validateAppleMusicLibrarySong,
     AppleMusicLibrarySong,
@@ -25,14 +25,13 @@ export class AppleMusicAPI {
 
     // Docs: https://developer.apple.com/documentation/applemusicapi/songs
     static fetchUserLibrarySongs = async (accessToken: String): Promise<Array<AppleMusicLibrarySong>> => {
-        Logger.info("Provided input params:", { accessToken: accessToken });
+        Logger.info("AppleMusicAPI.fetchUserLibrarySongs() inputs:", { accessToken: accessToken });
 
         var allRawResponseData: Array<Object> = [];
         try {
             var urlPath: string | null = '/v1/me/library/songs';
             while (urlPath != null && urlPath != undefined) {
-
-                let librarySongsReq = await axios({
+                let librarySongsReqConfig: AxiosRequestConfig = {
                     method: 'get',
                     baseURL: 'https://api.music.apple.com/',
                     url: urlPath,
@@ -44,7 +43,9 @@ export class AppleMusicAPI {
                         Authorization: ' Bearer ' + AppleMusicAPI.musicKitDevToken,
                         'Music-User-Token': accessToken
                     }
-                });
+                };
+                Logger.info("Library song request config", librarySongsReqConfig); 
+                let librarySongsReq = await axios(librarySongsReqConfig);
 
                 let jsonResponse = librarySongsReq.data;
                 // Below line added to address this bug: https://github.com/microsoft/TypeScript/issues/35546
@@ -88,11 +89,14 @@ export class AppleMusicAPI {
                 ErrorManager.reportErrorAndSetContext(e, "library song data", currData);
             }
         }
+        Logger.info("AppleMusicAPI.fetchUserLibrarySongs() output:", {allSongs: allSongs});
         return allSongs;
     }
 
     // Docs: https://developer.apple.com/documentation/applemusicapi/get_multiple_catalog_songs_by_id
     static fetchCatalogDataForSongs = async (catalogIds: Array<string>): Promise<Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong>> => {
+        Logger.info("AppleMusicAPI.fetchCatalogDataForSongs() inputs:", { catalogIds: catalogIds });
+        
         // Need to split ids into chunks of 250 (API has a max of 300 ids per request)
         const splitCatalogIds = (catalogIds: Array<string>): Array<Array<string>> => {
             if (catalogIds == null) {
@@ -113,7 +117,7 @@ export class AppleMusicAPI {
             for (const idChunk of idChunks) {
                 const idChunkString = idChunk.join(",");
                 // https://developer.apple.com/documentation/applemusicapi/get_multiple_catalog_songs_by_id
-                let songsReq = await axios({
+                let songReqConfig: AxiosRequestConfig = {
                     method: 'get',
                     baseURL: 'https://api.music.apple.com/',
                     url: '/v1/catalog/us/songs',
@@ -123,7 +127,9 @@ export class AppleMusicAPI {
                     headers: {
                         Authorization: ' Bearer ' + AppleMusicAPI.musicKitDevToken,
                     }
-                });
+                };
+                Logger.info("Catalog song request config", songReqConfig); 
+                let songsReq = await axios(songReqConfig);
 
                 let response = songsReq.data;
                 let responseValidation = response != null || response != undefined
@@ -165,6 +171,8 @@ export class AppleMusicAPI {
                 continue
             }
         }
+
+        Logger.info("AppleMusicAPI.fetchCatalogDataForSongs() output:", allSongs);
         return allSongs;
     }
 }

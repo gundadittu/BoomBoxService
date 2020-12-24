@@ -1,3 +1,5 @@
+import { Logger } from "..";
+
 export type UserStreamingAccountStoreItemAccountType = "spotify" | "appleMusic";
 export function validateUserStreamingAccountStoreItemAccountType(arg: UserStreamingAccountStoreItemAccountType | any): arg is UserStreamingAccountStoreItemAccountType {
     if (arg == null || arg == undefined) {
@@ -13,6 +15,8 @@ export type UserStreamingAccountStoreItemLibrary = {
     isrcCodesForSongs: Array<string>;
 }
 export function validateUserStreamingAccountStoreItemLibrary(arg: UserStreamingAccountStoreItemLibrary | any): arg is UserStreamingAccountStoreItemLibrary {
+    Logger.info("validateUserStreamingAccountStoreItemLibrary() inputs:", {arg: arg});
+
     if (arg == null || arg == undefined) {
         return false;
     }
@@ -28,6 +32,7 @@ export function validateUserStreamingAccountStoreItemLibrary(arg: UserStreamingA
         }
     }
     const isrcCodesForSongsValidate = validateIsrcCodesForSongs();
+    Logger.info("validateUserStreamingAccountStoreItemLibrary() outputs:", {isrcCodesForSongsValidate: isrcCodesForSongsValidate});
     return isrcCodesForSongsValidate
 }
 
@@ -39,6 +44,7 @@ export type UserStreamingAccountStoreItem = {
     library: UserStreamingAccountStoreItemLibrary
 }
 export function validateUserStreamingAccountStoreItem(arg: UserStreamingAccountStoreItem | any): arg is UserStreamingAccountStoreItem {
+    Logger.info("validateUserStreamingAccountStoreItem() inputs:", {arg: arg});
     if (arg == null || arg == undefined) {
         return false;
     }
@@ -47,5 +53,6 @@ export function validateUserStreamingAccountStoreItem(arg: UserStreamingAccountS
     const accessTokenValidate = typeof arg.appleMusicAccessToken == "string" || typeof arg.spotifyAccessToken == "string";
     // TODO: check that appropriate accesstoken is provided based on account type 
     const libraryValidate = validateUserStreamingAccountStoreItemLibrary(arg.library); 
+    Logger.info("validateUserStreamingAccountStoreItem() outputs:", {userUidValidate: userUidValidate, accountTypeValidate: accountTypeValidate, accessTokenValidate: accessTokenValidate, libraryValidate: libraryValidate});
     return userUidValidate && accountTypeValidate && accessTokenValidate && libraryValidate; 
 }

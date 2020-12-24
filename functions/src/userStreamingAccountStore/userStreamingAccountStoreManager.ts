@@ -1,11 +1,12 @@
 
-import { Firebase, ErrorManager } from '../index';
+import { Firebase, ErrorManager, Logger } from '../index';
 import { IsrcStoreItem } from "../isrcStore/isrcStoreTypes";
 import { validateUserStreamingAccountStoreItem } from "./userStreamingAccountStoreTypes";
 import * as firestoreConstants from '../constants/firestoreConstants';
 
 export class UserStreamingAccountStoreManager {
     static addAppleMusicAccountForUser = async (userUid: string, accessToken: string, libraryIsrcStoreItems: Array<IsrcStoreItem>): Promise<void> => {
+        Logger.info("Provided input params:", { userUid: userUid, accessToken: accessToken, libraryIsrcStoreItems: libraryIsrcStoreItems});
         const isrcCodes = libraryIsrcStoreItems.map(isrcStoreItem => isrcStoreItem.isrcId);
         const data = {
             userUid: userUid,

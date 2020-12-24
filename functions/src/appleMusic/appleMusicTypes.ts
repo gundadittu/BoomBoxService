@@ -22,8 +22,9 @@ export type AppleMusicCatalogSongAttributesArtwork = {
     textColor4?: string
 }
 function validateAppleMusicCatalogSongAttributesArtwork(arg: AppleMusicCatalogSongAttributesArtwork | any): arg is AppleMusicCatalogSongAttributesArtwork {
+    Logger.info("validateAppleMusicCatalogSongAttributesArtwork() inputs:", { arg: arg });
     if (arg == null || arg == undefined) {
-        Logger.info("validateAppleMusicCatalogSongAttributesArtwork failed because provided arg was null/undefined:", arg)
+        Logger.info("validateAppleMusicCatalogSongAttributesArtwork() failed because provided arg was null/undefined:", arg)
         return false;
     }
     // const widthValidate = typeof arg.width == "number"; 
@@ -34,7 +35,7 @@ function validateAppleMusicCatalogSongAttributesArtwork(arg: AppleMusicCatalogSo
     // const textColor2Validate = typeof arg.textColor2 == "string";
     // const textColor3Validate = typeof arg.textColor3 == "string";     
     // const textColor4Validate = typeof arg.textColor4 == "string";
-    Logger.info(`validateAppleMusicCatalogSongAttributesArtwork returned urlValidate:${urlValidate} and bgColorValidate:${bgColorValidate}`, arg)
+    Logger.info(`validateAppleMusicCatalogSongAttributesArtwork() output:`, { urlValidate: urlValidate, bgColorValidate: bgColorValidate });
     return urlValidate && bgColorValidate;
 }
 
@@ -49,7 +50,7 @@ export function validateAppleMusicCatalogSongPlayParams(arg: AppleMusicCatalogSo
     }
     const idValidate = typeof arg.id == "string";
     const kindValidate = typeof arg.kind == "string";
-    Logger.info(`validateAppleMusicCatalogSongPlayParams returned idValidate:${idValidate} and kindValidate:${kindValidate}`, arg)
+    Logger.info("validateAppleMusicCatalogSongPlayParams() output:", { idValidate: idValidate, kindValidate: kindValidate });
     return idValidate && kindValidate;
 }
 
@@ -70,6 +71,7 @@ export type AppleMusicCatalogSongAttributes = {
     artwork: AppleMusicCatalogSongAttributesArtwork
 }
 export function validateAppleMusicCatalogSongAttributes(arg: AppleMusicCatalogSongAttributes | any): arg is AppleMusicCatalogSongAttributes {
+    Logger.info("validateAppleMusicCatalogSongAttributes() input:", { arg: arg });
     if (arg == null || arg == undefined) {
         Logger.info("validateAppleMusicCatalogSongAttributes failed because provided arg was null/undefined:", arg)
         return false;
@@ -91,7 +93,7 @@ export function validateAppleMusicCatalogSongAttributes(arg: AppleMusicCatalogSo
     // const discNumberValidate = typeof arg.discNumberValidate == "number"; 
     // console.log("validateAppleMusicCatalogSongAttributes: " + artworkValidate + durationInMillisValidate + artistNameValidate + genreNamesValidate + isrcValidate + nameValidate + releaseDateValidate + playParamsValidate + urlValidate);
 
-    Logger.info(`validateAppleMusicCatalogSongAttributes returned durationInMillisValidate:${durationInMillisValidate}, artistNameValidate:${artistNameValidate}, genreNamesValidate:${genreNamesValidate}, isrcValidate:${isrcValidate}, nameValidate:${nameValidate}, playParamsValidate:${playParamsValidate}, releaseDateValidate:${releaseDateValidate}, urlValidate:${urlValidate}, artworkValidate:${artworkValidate}`, arg)
+    Logger.info("validateAppleMusicCatalogSongAttributes() output:", { durationInMillisValidate: durationInMillisValidate, artistNameValidate: artistNameValidate, genreNamesValidate: genreNamesValidate, isrcValidate: isrcValidate, nameValidate: nameValidate, playParamsValidate: playParamsValidate, releaseDateValidate: releaseDateValidate, urlValidate: urlValidate, artworkValidate: artworkValidate });
     return artworkValidate && durationInMillisValidate && artistNameValidate && genreNamesValidate && isrcValidate && nameValidate && releaseDateValidate && playParamsValidate && urlValidate;
 }
 
@@ -103,6 +105,7 @@ export type AppleMusicCatalogSong = {
     type: string // TODO: make this a custom type  
 }
 export function validateAppleMusicCatalogSong(arg: AppleMusicCatalogSong | any): arg is AppleMusicCatalogSong {
+    Logger.info("validateAppleMusicCatalogSong() input:", { arg: arg });
     if (arg == null || arg == undefined) {
         Logger.info("validateAppleMusicCatalogSong failed because provided arg was null/undefined:", arg)
         return false;
@@ -112,7 +115,7 @@ export function validateAppleMusicCatalogSong(arg: AppleMusicCatalogSong | any):
     const typeValidate = typeof arg.type == "string";
     const hrefValidate = typeof arg.href == "string";
 
-    Logger.info(`validateAppleMusicCatalogSong returned attributesValidate:${attributesValidate}, idValidate:${idValidate}, typeValidate:${typeValidate}, hrefValidate:${hrefValidate}`, arg);
+    Logger.info("validateAppleMusicCatalogSong() outputs:", { attributesValidate: attributesValidate, idValidate: idValidate, typeValidate: typeValidate, hrefValidate: hrefValidate });
     return attributesValidate && idValidate && typeValidate && hrefValidate;
 }
 
@@ -133,6 +136,8 @@ export type DisabledAppleMusicCatalogSongAttributes = {
     artwork?: AppleMusicCatalogSongAttributesArtwork
 }
 export function validateDisabledAppleMusicCatalogSongAttributes(arg: DisabledAppleMusicCatalogSongAttributes | any): arg is DisabledAppleMusicCatalogSongAttributes {
+    Logger.info("validateDisabledAppleMusicCatalogSongAttributes() inputs:", { arg: arg });
+
     if (arg == null || arg == undefined) {
         Logger.info("validateDisabledAppleMusicCatalogSongAttributes failed because provided arg was null/undefined:", arg)
         return false;
@@ -143,7 +148,7 @@ export function validateDisabledAppleMusicCatalogSongAttributes(arg: DisabledApp
     const nameValidate = typeof arg.name == "string";
     const urlValidate = typeof arg.url == "string";
 
-    Logger.info(`validateDisabledAppleMusicCatalogSongAttributes returned artistNameValidate:${artistNameValidate}, isrcValidate:${isrcValidate}, nameValidate:${nameValidate}, urlValidate:${urlValidate}`, arg);
+    Logger.info("validateDisabledAppleMusicCatalogSongAttributes() outputs:", { artistNameValidate: artistNameValidate, isrcValidate: isrcValidate, nameValidate: nameValidate, urlValidate: urlValidate });
     return artistNameValidate && isrcValidate && nameValidate && urlValidate;
 }
 
@@ -164,7 +169,7 @@ export function validateDisabledAppleMusicCatalogSong(arg: DisabledAppleMusicCat
     const typeValidate = typeof arg.type == "string";
     const hrefValidate = typeof arg.href == "string";
 
-    Logger.info(`validateDisabledAppleMusicCatalogSong returned attributesValidate:${attributesValidate}, idValidate:${idValidate}, typeValidate:${typeValidate}, hrefValidate:${hrefValidate}`, arg);
+    Logger.info("validateDisabledAppleMusicCatalogSong() outputs", { attributesValidate: attributesValidate, idValidate: idValidate, typeValidate: typeValidate, hrefValidate: hrefValidate });
     return attributesValidate && idValidate && typeValidate && hrefValidate;
 }
 
@@ -176,8 +181,9 @@ export type AppleMusicLibrarySongAttributesPlayParams = {
     catalogId: string
 }
 export function validateAppleMusicLibrarySongAttributesPlayParams(arg: AppleMusicLibrarySongAttributesPlayParams | any): arg is AppleMusicLibrarySongAttributesPlayParams {
+    Logger.info("validateAppleMusicLibrarySongAttributesPlayParams() inputs:", { arg: arg });
     if (arg == null || arg == undefined) {
-        Logger.info("validateAppleMusicLibrarySongAttributesPlayParams failed because provided arg was null/undefined:", arg)
+        Logger.info("validateAppleMusicLibrarySongAttributesPlayParams() failed because provided arg was null/undefined:", arg)
         return false;
     }
     const idValidate = typeof arg.id == "string";
@@ -186,7 +192,7 @@ export function validateAppleMusicLibrarySongAttributesPlayParams(arg: AppleMusi
     const catalogIDValidate = typeof arg.catalogId == "string";
     // const reportingValidate = typeof arg.reporting == "boolean"; // No need for this
 
-    Logger.info(`validateAppleMusicLibrarySongAttributesPlayParams returned idValidate:${idValidate}, kindValidate:${kindValidate}, isLibraryValidate:${isLibraryValidate}, catalogIDValidate:${catalogIDValidate}`, arg);
+    Logger.info("validateAppleMusicLibrarySongAttributesPlayParams() inputs:", { idValidate: idValidate, kindValidate: kindValidate, isLibraryValidate: isLibraryValidate, catalogIDValidate: catalogIDValidate });
     return idValidate && kindValidate && isLibraryValidate && catalogIDValidate;
 }
 
@@ -196,6 +202,8 @@ export type AppleMusicLibrarySongAttributesArtwork = {
     url: string,
 }
 export function validateAppleMusicLibrarySongAttributesArtwork(arg: AppleMusicLibrarySongAttributesArtwork | any): arg is AppleMusicLibrarySongAttributesArtwork {
+    Logger.info("validateAppleMusicLibrarySongAttributesArtwork() inputs:", { arg: arg });
+
     if (arg == null || arg == undefined) {
         Logger.info("validateAppleMusicLibrarySongAttributesArtwork failed because provided arg was null/undefined:", arg)
         return false;
@@ -203,7 +211,7 @@ export function validateAppleMusicLibrarySongAttributesArtwork(arg: AppleMusicLi
     const urlValidate = typeof arg.url == "string";
     // const widthValidate = typeof arg.width == "string"; 
     // const heightValidate = typeof arg.height == "string"; 
-    Logger.info(`validateAppleMusicLibrarySongAttributesArtwork returned urlValidate:${urlValidate}`, arg);
+    Logger.info("validateAppleMusicLibrarySongAttributesArtwork() inputs:", { urlValidate: urlValidate });
     return urlValidate
 }
 
@@ -221,6 +229,8 @@ export type AppleMusicLibrarySongAttributes = {
     trackNumber?: number
 }
 export function validateAppleMusicLibrarySongAttributes(arg: AppleMusicLibrarySongAttributes | any): arg is AppleMusicLibrarySongAttributes {
+    Logger.info("validateAppleMusicLibrarySongAttributes() inputs:", { arg: arg });
+
     if (arg == null || arg == undefined) {
         Logger.info("validateAppleMusicLibrarySongAttributes failed because provided arg was null/undefined:", arg)
         return false;
@@ -237,8 +247,8 @@ export function validateAppleMusicLibrarySongAttributes(arg: AppleMusicLibrarySo
     // const hasLyricsValidate = typeof arg.hasLyrics == "boolean"; 
     // const discNumberValidate = typeof arg.discNumberValidate == "number"; 
     // console.log("validateAppleMusicLibrarySongAttributes: " + artistNameValidate + genreNamesValidate + durationInMillisValidate + nameValidate + playParamsValidate);
-    
-    Logger.info(`validateAppleMusicLibrarySongAttributes returned artistNameValidate:${artistNameValidate}, genreNamesValidate:${genreNamesValidate}, durationInMillisValidate:${durationInMillisValidate}, nameValidate:${nameValidate}, playParamsValidate:${playParamsValidate}`, arg);
+
+    Logger.info("validateAppleMusicLibrarySongAttributes() outputs:", { artistNameValidate: artistNameValidate, genreNamesValidate: genreNamesValidate, durationInMillisValidate: durationInMillisValidate, nameValidate: nameValidate, playParamsValidate: playParamsValidate });
     return artistNameValidate && genreNamesValidate && durationInMillisValidate && nameValidate && playParamsValidate
 }
 
@@ -249,6 +259,7 @@ export type AppleMusicLibrarySong = {
     attributes: AppleMusicLibrarySongAttributes
 }
 export function validateAppleMusicLibrarySong(arg: AppleMusicLibrarySong | any): arg is AppleMusicLibrarySong {
+    Logger.info("validateAppleMusicLibrarySong() inputs:", { arg: arg });
     if (arg == null || arg == undefined) {
         Logger.info("validateAppleMusicLibrarySong failed because provided arg was null/undefined:", arg)
         return false;
@@ -258,6 +269,6 @@ export function validateAppleMusicLibrarySong(arg: AppleMusicLibrarySong | any):
     const hrefValidate = typeof arg.href == "string"
     const attributesValidate = validateAppleMusicLibrarySongAttributes(arg.attributes);
     // console.log("validateAppleMusicLibrarySong: " + idValidate + typeValidate + hrefValidate + attributesValidate);
-    Logger.info(`validateAppleMusicLibrarySongAttributes returned idValidate:${idValidate}, typeValidate:${typeValidate}, hrefValidate:${hrefValidate}, attributesValidate:${attributesValidate}`, arg);
+    Logger.info("validateAppleMusicLibrarySong() outputs:", { idValidate: idValidate, typeValidate: typeValidate, hrefValidate: hrefValidate, attributesValidate: attributesValidate });
     return idValidate && typeValidate && hrefValidate && attributesValidate;
 }

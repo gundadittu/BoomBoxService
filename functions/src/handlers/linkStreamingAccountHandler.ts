@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import { AppleMusicAPI } from '../appleMusic/appleMusicAPI';
 import { IsrcStoreManager } from '../isrcStore/isrcStoreManager';
-import { ErrorManager } from '../index';
+import { ErrorManager, Logger } from '../index';
 import {
     AppleMusicLibrarySong,
     AppleMusicCatalogSong,
@@ -24,9 +24,10 @@ function validateLinkedStreamingAccountType(arg: LinkedStreamingAccountType | an
 }
 
 // TODO: configure for spotify set up 
- export const linkStreamingAccountForUser = functions.https.onCall(async (data, context) => {
-    // const auth = context.auth; ADD BACK FOR PROD
-    const userUid = "VYPvKj9Abk3yKZxRswEEWctmAx9A";// ADD BACK FOR PROD: auth?.uid || null;
+export const linkStreamingAccountForUser = functions.https.onCall(async (data, context) => {
+    Logger.info("linkStreamingAccountForUser() inputs", { data: data, context: context });
+    const auth = context.auth;
+    const userUid = auth?.uid || null;
     const rawAccountType = data.accountType || null;
     const appleMusicAccessToken = data.appleMusicAccessToken || null;
     // TODO: const spotifyAccessToken: String = data.spotifyAccessToken || null; // extract spotify credentials 
@@ -35,7 +36,7 @@ function validateLinkedStreamingAccountType(arg: LinkedStreamingAccountType | an
         let e = Error(errorMessage);
         ErrorManager.reportErrorAndSetContext(e, "params", data);
         throw new functions.https.HttpsError("invalid-argument", "Missing authentication or required parameters.");
-        
+
         // TODO: add type check for spotify credentials 
     } else if (typeof userUid !== "string" || !validateLinkedStreamingAccountType(rawAccountType) || typeof appleMusicAccessToken !== 'string') {
         const errorMessage = "Missing authentication and/or required parameters.";
