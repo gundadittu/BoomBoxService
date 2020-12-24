@@ -1,28 +1,23 @@
 
-// https://www.npmjs.com/package/axios
-// https://kapeli.com/cheat_sheets/Axios.docset/Contents/Resources/Documents/index
 import axios from 'axios';
-// import * as qs from 'qs';
 import {
-    // AppleMusicLibrarySongsResponse,
     validateAppleMusicLibrarySong,
     AppleMusicLibrarySong,
     validateAppleMusicCatalogSong,
     AppleMusicCatalogSong,
-    // validateAppleMusicCatalogSongsResponse,
-    // validateAppleMusicLibrarySong,
-    // AppleMusicLibrarySongAttributes,
-    // validateAppleMusicLibrarySongAttributes,
-    // AppleMusicLibrarySongAttributesArtwork, 
-    // validateAppleMusicLibrarySongAttributesArtwork, 
-    // AppleMusicLibrarySongAttributesPlayParams, 
-    // validateAppleMusicLibrarySongAttributesPlayParams
+    DisabledAppleMusicCatalogSong,
+    validateDisabledAppleMusicCatalogSong,
 } from './appleMusicTypes';
+import { ErrorManager, Logger } from '../index';
 
 /* Apple Music API Relevant Docs/Tutorials: 
     - https://developer.apple.com/documentation/applemusicapi/
     - https://crunchybagel.com/integrating-apple-music-into-your-ios-app/
 */
+// Other Relevent Docs: 
+// https://www.npmjs.com/package/axios
+// https://kapeli.com/cheat_sheets/Axios.docset/Contents/Resources/Documents/index
+
 export class AppleMusicAPI {
     // TODO: store credential in a secure way
     static musicKitDevToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ikg5N1gyNDRXRzQifQ.eyJpc3MiOiJKUTRLOEVFNzdQIiwiaWF0IjoxNjA4NDAwODA3LCJleHAiOjE2MjIzMDc2MDd9.vNFIr68DREmo6TpIpjExAnsXD8fLW0fW_QdWUPxuGTloKCrSIsBXzmIRCoaoAzRNPhkTi258l-pKg5VmCFqNbw";
@@ -30,6 +25,8 @@ export class AppleMusicAPI {
 
     // Docs: https://developer.apple.com/documentation/applemusicapi/songs
     static fetchUserLibrarySongs = async (accessToken: String): Promise<Array<AppleMusicLibrarySong>> => {
+        Logger.info("Provided input params:", { accessToken: accessToken });
+
         var allRawResponseData: Array<Object> = [];
         try {
             var urlPath: string | null = '/v1/me/library/songs';
@@ -54,8 +51,10 @@ export class AppleMusicAPI {
                 let response = JSON.parse(JSON.stringify(jsonResponse));
                 let responseValidation = response != null || response != undefined
                 if (!responseValidation) {
-                    // TODO: report this error and all relevant data + request logs 
-                    throw Error("Apple Music API returned null/undefined response.");
+                    const errorMessage = "Apple Music API returned null/undefined response:";
+                    const e = Error(errorMessage);
+                    ErrorManager.reportErrorAndSetContext(e, "api response", response);
+                    throw e; 
                 }
 
                 // Update for next while iteration
@@ -64,15 +63,16 @@ export class AppleMusicAPI {
                 const responseData = response.data;
                 let responseDataValidation = responseData != null && responseData != undefined
                 if (!responseDataValidation) {
-                    // TODO: report this error and all relevant data + request logs 
+                    const errorMessage = "Apple Music Library Songs API returned null/undefined response data body:";
+                    const error = Error(errorMessage);
+                    ErrorManager.reportErrorAndSetContext(error, "api response", response);
                     continue
                 }
                 allRawResponseData.push(...responseData);
             }
         } catch (error) {
             // Apple Music API Error Docs: https://developer.apple.com/documentation/applemusicapi/error  
-            // TODO: report error properly here 
-            // throw Error("There was an issue getting your music from Apple Music.");
+            ErrorManager.reportErrorOnly(error);
             throw error;
         }
         var allSongs: Array<AppleMusicLibrarySong> = [];
@@ -83,15 +83,16 @@ export class AppleMusicAPI {
             if (validateAppleMusicLibrarySong(currData)) {
                 allSongs.push(currData);
             } else {
-                console.error("validateAppleMusicLibrarySong failed for: " + JSON.stringify(currData));
-                // TODO: log this error and include log details on what type validation failed + song data 
+                const errorMessage = "validateAppleMusicLibrarySong failed for:";
+                let e = Error(errorMessage);
+                ErrorManager.reportErrorAndSetContext(e, "library song data", currData);
             }
         }
         return allSongs;
     }
 
     // Docs: https://developer.apple.com/documentation/applemusicapi/get_multiple_catalog_songs_by_id
-    static fetchCatalogDataForSongs = async (catalogIds: Array<string>): Promise<Array<AppleMusicCatalogSong>> => {
+    static fetchCatalogDataForSongs = async (catalogIds: Array<string>): Promise<Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong>> => {
         // Need to split ids into chunks of 250 (API has a max of 300 ids per request)
         const splitCatalogIds = (catalogIds: Array<string>): Array<Array<string>> => {
             if (catalogIds == null) {
@@ -124,40 +125,44 @@ export class AppleMusicAPI {
                     }
                 });
 
-                // const jsonResponse = songsReq.data;
-                // console.log(jsonResponse);
                 let response = songsReq.data;
                 let responseValidation = response != null || response != undefined
                 if (!responseValidation) {
-                    // TODO: report this error and all relevant data + request logs 
-                    throw Error("Apple Music API returned null/undefined response.");
+                    const errorMessage = "Apple Music API returned null/undefined response.";
+                    let e = Error(errorMessage);
+                    ErrorManager.reportErrorAndSetContext(e, "api response", response);
+                    throw e;
                 }
 
                 const responseData = response.data;
                 let responseDataValidation = responseData != null && responseData != undefined
                 if (!responseDataValidation) {
-                    // TODO: report this error and all relevant data + request logs 
+                    const errorMessage = "Apple Music Catalog Songs API returned null/undefined response data body:";
+                    const error = Error(errorMessage);
+                    ErrorManager.reportErrorAndSetContext(error, "api response", response);
                     continue
                 }
                 allRawResponseData.push(...responseData);
             }
-        } catch (error) {
+        } catch (e) {
             // Apple Music API Error Docs: https://developer.apple.com/documentation/applemusicapi/error  
-            // TODO: report this error + better error message 
-            // throw Error("There was an issue getting your music from Apple Music.");
-            console.error(error);
-            throw error;
+            ErrorManager.reportErrorOnly(e);
+            throw e;
         }
 
-        var allSongs: Array<AppleMusicCatalogSong> = [];
+        var allSongs: Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong> = [];
         for (var i = 0; i < allRawResponseData.length; i++) {
             console.log("validateAppleMusicCatalogSong started for item at index " + i);
             const currData = allRawResponseData[i];
             if (validateAppleMusicCatalogSong(currData)) {
                 allSongs.push(currData);
+            } else if (validateDisabledAppleMusicCatalogSong(currData)) {
+                allSongs.push(currData);
             } else {
-                console.error("validateAppleMusicCatalogSong failed for: " + JSON.stringify(currData));
-                // TODO: log this error and include log details on what type validation failed + song data 
+                const errorMessage = "validateAppleMusicCatalogSong failed for:";
+                let e = Error(errorMessage);
+                ErrorManager.reportErrorAndSetContext(e, "catalog song data", currData);
+                continue
             }
         }
         return allSongs;

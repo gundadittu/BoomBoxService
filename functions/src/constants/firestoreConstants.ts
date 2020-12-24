@@ -1,2 +1,2 @@
-export const LinkedStreamingAccountCollectionKey = "LinkedStreamingAccount"; 
-export const AppleMusicIsrcStoreCollectionKey = "AppleMusicIsrcStore"; 
+export const UserStreamingAccountStoreCollectionKey = "UserStreamingAccountStore"; 
+export const IsrcStoreCollectionKey = "IsrcStore"; 
