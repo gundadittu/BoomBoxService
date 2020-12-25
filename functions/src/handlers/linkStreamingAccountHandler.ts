@@ -9,6 +9,8 @@ import {
 } from '../appleMusic/appleMusicTypes';
 import { IsrcStoreItem } from '../isrcStore/isrcStoreTypes';
 import { UserStreamingAccountStoreManager } from '../userStreamingAccountStore/userStreamingAccountStoreManager';
+import { UserStreamingLibraryStoreManager } from '../userStreamingLibraryStore/userStreamingLibraryStoreManager';
+import * as firestoreConstants from '../constants/firestoreConstants';
 
 // Added to address this issue: https://stackoverflow.com/questions/40900791/cannot-redeclare-block-scoped-variable-in-unrelated-files
 export { };
@@ -31,6 +33,9 @@ export const linkStreamingAccountForUser = functions.https.onCall(async (data, c
     const rawAccountType = data.accountType || null;
     const appleMusicAccessToken = data.appleMusicAccessToken || null;
     // TODO: const spotifyAccessToken: String = data.spotifyAccessToken || null; // extract spotify credentials 
+
+    // TODO: compare existing and old credentials to make sure we are not doing duplicate work --> may not be needed? based on how often FE will send this requets?
+
     if (userUid == null || rawAccountType == null || (appleMusicAccessToken == null /* && spotifyAccessToken == null */)) {
         const errorMessage = "Missing authentication and/or required parameters.";
         let e = Error(errorMessage);
@@ -54,20 +59,9 @@ export const linkStreamingAccountForUser = functions.https.onCall(async (data, c
     const type: LinkedStreamingAccountType = rawAccountType
 
     if (type == "appleMusic") {
-        const allLibrarySongs: Array<AppleMusicLibrarySong> = await AppleMusicAPI.fetchUserLibrarySongs(appleMusicAccessToken);
-
-        const catalogIds = allLibrarySongs.map((libSong: AppleMusicLibrarySong) => {
-            return libSong.attributes.playParams.catalogId;
-        });
-
-        // Fetch Apple Music Catalog data for User's Library Songs (allows us to access isrc code)
-        const appleMusicCatalogSongs: Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong> = await AppleMusicAPI.fetchCatalogDataForSongs(catalogIds);
-
-        // Store user's library songs into global Isrc Store 
-        const isrcStoreItems: Array<IsrcStoreItem> = await IsrcStoreManager.storeAppleMusicCatalogSongsIntoIsrcStore(appleMusicCatalogSongs);
-
         // Store user's credentials + library 
-        await UserStreamingAccountStoreManager.addAppleMusicAccountForUser(userUid, appleMusicAccessToken, isrcStoreItems);
+        const streamingAccount = await UserStreamingAccountStoreManager.storeAppleMusicAccountForUser(userUid, appleMusicAccessToken);
+        return streamingAccount
     } else if (type == "spotify") {
         // TODO: implement 
         throw Error("Spotify support not implemented yet");
@@ -75,24 +69,44 @@ export const linkStreamingAccountForUser = functions.https.onCall(async (data, c
     return
 });
 
-    // Relevant Docs: 
-    // - https://firebase.google.com/docs/reference/functions/providers_firestore_.documentbuilder.html#on-write
-    // export const triggerLinkedStreamingAccountLibraryUpdate = functions.firestore.document(LinkedStreamingAccountCollectionKey + '/{userUID').onWrite((change, context) => { 
-    //     const oldData = change.before.data();
-    //     const newData = change.after.data(); 
+// Relevant Docs: 
+// - https://firebase.google.com/docs/reference/functions/providers_firestore_.documentbuilder.html#on-write
+export const triggerLinkedStreamingAccountLibraryUpdate = functions.firestore.document(firestoreConstants.UserStreamingAccountStoreCollectionKey + '/{userUid}').onWrite(async (change, context) => {
+    // const oldData = change.before.data();
+    const newData = change.after.data();
 
-    //     const eventType = context.eventType; 
+    const eventType = context.eventType;
 
-    //     // Nothing to update
-    //     if (eventType == "google.firestore.document.delete" || newData == null) { 
-    //         return 
-    //     }
+    // Nothing to update
+    if (eventType == "google.firestore.document.delete" || newData == null) {
+        return
+    }
 
-    //     if (newData.type == "appleMusic") { 
+    // Library data already present 
+    if (newData.library != null) {
+        return
+    }
 
-    //     } else if (newData.type == "spotify") { 
-    //        // TODO  
-    //         return 
-    //     }
+    const userUid = newData.userUid;
+    if (userUid == null) {
+        return
+    }
 
-    // });
+    const appleMusicAccessToken = newData.appleMusicAccessToken;
+    if (newData.type == "appleMusic" && appleMusicAccessToken != null) {
+        const allLibrarySongs: Array<AppleMusicLibrarySong> = await AppleMusicAPI.fetchUserLibrarySongs(appleMusicAccessToken);
+        const catalogIds = allLibrarySongs.map((libSong: AppleMusicLibrarySong) => {
+            return libSong.attributes.playParams.catalogId;
+        });
+        // Fetch Apple Music Catalog data for User's Library Songs (allows us to access isrc code)
+        const appleMusicCatalogSongs: Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong> = await AppleMusicAPI.fetchCatalogDataForSongs(catalogIds);
+        // Store user's library songs into global Isrc Store 
+        const isrcStoreItems: Array<IsrcStoreItem> = await IsrcStoreManager.storeAppleMusicCatalogSongsIntoIsrcStore(appleMusicCatalogSongs);
+
+        await UserStreamingLibraryStoreManager.storeAppleMusicLibraryForUser(userUid, isrcStoreItems);
+    } else if (newData.type == "spotify") {
+        // TODO : implement 
+        return
+    }
+
+});

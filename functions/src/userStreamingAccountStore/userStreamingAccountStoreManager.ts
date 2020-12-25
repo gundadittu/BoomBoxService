@@ -1,20 +1,15 @@
 
 import { Firebase, ErrorManager, Logger } from '../index';
-import { IsrcStoreItem } from "../isrcStore/isrcStoreTypes";
-import { validateUserStreamingAccountStoreItem } from "./userStreamingAccountStoreTypes";
+import { UserStreamingAccountStoreItem, validateUserStreamingAccountStoreItem } from "./userStreamingAccountStoreTypes";
 import * as firestoreConstants from '../constants/firestoreConstants';
 
 export class UserStreamingAccountStoreManager {
-    static addAppleMusicAccountForUser = async (userUid: string, accessToken: string, libraryIsrcStoreItems: Array<IsrcStoreItem>): Promise<void> => {
-        Logger.info("Provided input params:", { userUid: userUid, accessToken: accessToken, libraryIsrcStoreItems: libraryIsrcStoreItems});
-        const isrcCodes = libraryIsrcStoreItems.map(isrcStoreItem => isrcStoreItem.isrcId);
+    static storeAppleMusicAccountForUser = async (userUid: string, accessToken: string): Promise<UserStreamingAccountStoreItem> => {
+        Logger.info("Provided input params:", { userUid: userUid, accessToken: accessToken });
         const data = {
             userUid: userUid,
             accountType: "appleMusic",
             appleMusicAccessToken: accessToken,
-            library: {
-                isrcCodesForSongs: isrcCodes
-            }
         };
 
         if (!validateUserStreamingAccountStoreItem(data)) {
@@ -22,10 +17,11 @@ export class UserStreamingAccountStoreManager {
             let e = Error(errorMessage);
             ErrorManager.reportErrorAndSetContext(e, "UserStreamingAccountStoreItem", data);
             throw e;
+        } else {
+            // Insert into database 
+            const usersLinkedStreamingAccountRef = Firebase.firestoreClient.collection(firestoreConstants.UserStreamingAccountStoreCollectionKey).doc(userUid);
+            await usersLinkedStreamingAccountRef.set(data);
+            return data;
         }
-
-        // Insert into database 
-        const usersLinkedStreamingAccountRef = Firebase.firestoreClient.collection(firestoreConstants.UserStreamingAccountStoreCollectionKey).doc(userUid);
-        await usersLinkedStreamingAccountRef.set(data);
     }
 }
