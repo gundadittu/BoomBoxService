@@ -1,4 +1,4 @@
-import { Logger } from "..";
+import { LogManager } from "..";
 
 export type UserStreamingAccountStoreItemAccountType = "spotify" | "appleMusic";
 export function validateUserStreamingAccountStoreItemAccountType(arg: UserStreamingAccountStoreItemAccountType | any): arg is UserStreamingAccountStoreItemAccountType {
@@ -19,7 +19,7 @@ export type UserStreamingAccountStoreItem = {
     // library: UserStreamingAccountStoreItemLibrary
 }
 export function validateUserStreamingAccountStoreItem(arg: UserStreamingAccountStoreItem | any): arg is UserStreamingAccountStoreItem {
-    Logger.info("validateUserStreamingAccountStoreItem() inputs:", { arg: arg });
+    LogManager.info("validateUserStreamingAccountStoreItem() inputs:", { arg: arg });
     if (arg == null || arg == undefined) {
         return false;
     }
@@ -28,6 +28,6 @@ export function validateUserStreamingAccountStoreItem(arg: UserStreamingAccountS
     const accessTokenValidate = typeof arg.appleMusicAccessToken == "string" || typeof arg.spotifyAccessToken == "string";
     // TODO: check that appropriate accesstoken is provided based on account type 
     // const libraryValidate = validateUserStreamingAccountStoreItemLibrary(arg.library); 
-    Logger.info("validateUserStreamingAccountStoreItem() outputs:", { userUidValidate: userUidValidate, accountTypeValidate: accountTypeValidate, accessTokenValidate: accessTokenValidate });
+    LogManager.info("validateUserStreamingAccountStoreItem() outputs:", { userUidValidate: userUidValidate, accountTypeValidate: accountTypeValidate, accessTokenValidate: accessTokenValidate });
     return userUidValidate && accountTypeValidate && accessTokenValidate;
 }

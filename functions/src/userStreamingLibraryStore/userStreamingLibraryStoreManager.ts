@@ -1,15 +1,15 @@
 import { IsrcStoreItem } from "../isrcStore/isrcStoreTypes";
-import { Firebase, ErrorManager, Logger } from '../index';
+import { Firebase, ErrorManager, LogManager } from '../index';
 import {validateUserStreamingLibraryStoreItem, UserStreamingLibraryStoreItem  } from './userStreamingLibraryStoreTypes';
 import * as firestoreConstants from '../constants/firestoreConstants';
 
 export class UserStreamingLibraryStoreManager {
     static storeAppleMusicLibraryForUser = async (userUid: string, libraryIsrcStoreItems: Array<IsrcStoreItem>): Promise<UserStreamingLibraryStoreItem> => {
-        Logger.info("Provided input params:", { userUid: userUid, libraryIsrcStoreItems: libraryIsrcStoreItems });
+        LogManager.info("Provided input params:", { userUid: userUid, libraryIsrcStoreItems: libraryIsrcStoreItems });
  
         const isrcCodes = libraryIsrcStoreItems.map(isrcStoreItem => isrcStoreItem.isrcId);
         const libraryStoreItem = {
-            isrcCodesForSongs: isrcCodes
+            isrcCodesForSongs: isrcCodes,
         }
 
         if (!validateUserStreamingLibraryStoreItem(libraryStoreItem)) {

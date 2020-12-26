@@ -1,10 +1,10 @@
-import { Firebase, ErrorManager, Logger } from '../index';
+import { Firebase, ErrorManager, LogManager } from '../index';
 import * as firestoreConstants from '../constants/firestoreConstants';
 import {
     AppleMusicCatalogSong,
     validateAppleMusicCatalogSong,
     DisabledAppleMusicCatalogSong,
-    validateDisabledAppleMusicCatalogSong
+    validateDisabledAppleMusicCatalogSong,
 } from '../appleMusic/appleMusicTypes';
 import { IsrcStoreItem } from './isrcStoreTypes';
 
@@ -14,7 +14,7 @@ export { };
 export class IsrcStoreManager {
 
     static storeAppleMusicCatalogSongsIntoIsrcStore = async (appleMusicCatalogSongs: Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong>): Promise<Array<IsrcStoreItem>> => {
-        Logger.info("storeAppleMusicCatalogSongsIntoIsrcStore() inputs:", {appleMusicCatalogSongs: appleMusicCatalogSongs})
+        LogManager.info("storeAppleMusicCatalogSongsIntoIsrcStore() inputs:", {appleMusicCatalogSongs: appleMusicCatalogSongs})
         
         var allNewIsrcStoreItems: Array<IsrcStoreItem> = [];
         for (var currSong of appleMusicCatalogSongs) {
@@ -30,14 +30,14 @@ export class IsrcStoreManager {
                     disabled: disabledValue,
                     mediaType: mediaTypeValue,
                     appleMusicCatalogId: appleMusicCatalogIdValue,
-                    appleMusicCatalogSong: enabledAMCatalogSong
+                    appleMusicCatalogSong: enabledAMCatalogSong,
                     // spotifyId: string, // TODO: 
                     // spotifyTrack: SpotifyTrack // TODO: 
                 }
                 allNewIsrcStoreItems.push(newIsrcStoreItem)
             } else if (validateDisabledAppleMusicCatalogSong(currSong)) {
                 const disabledAMCatalogSong: DisabledAppleMusicCatalogSong = currSong;
-                const disabledValue = false;
+                const disabledValue = true;
                 const isrcIdValue = disabledAMCatalogSong.attributes.isrc;
                 const mediaTypeValue = "song";
                 const appleMusicCatalogIdValue = disabledAMCatalogSong.id;
@@ -47,7 +47,7 @@ export class IsrcStoreManager {
                     disabled: disabledValue,
                     mediaType: mediaTypeValue,
                     appleMusicCatalogId: appleMusicCatalogIdValue,
-                    appleMusicCatalogSong: disabledAMCatalogSong
+                    appleMusicCatalogSong: disabledAMCatalogSong,
                     // spotifyId: string, // TODO: 
                     // spotifyTrack: SpotifyTrack // TODO: 
                 }
@@ -72,7 +72,7 @@ export class IsrcStoreManager {
             return allChunks;
         }
 
-        Logger.info("storeAppleMusicCatalogSongsIntoIsrcStore() output:", {allNewIsrcStoreItems: allNewIsrcStoreItems})
+        LogManager.info("storeAppleMusicCatalogSongsIntoIsrcStore() output:", {allNewIsrcStoreItems: allNewIsrcStoreItems})
 
         let newIsrcItemChunks: Array<Array<IsrcStoreItem>> = splitNewIsrcStoreItems(allNewIsrcStoreItems);
         for (const chunk of newIsrcItemChunks) {

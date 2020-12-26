@@ -5,7 +5,10 @@ import * as serviceAccount from './credentials/serviceAccountKey.json';
 
 import * as Sentry from '@sentry/node';
 
-import { linkStreamingAccountForUser } from './handlers/linkStreamingAccountHandler';
+import { setUserStreamingAccount } from './handlers/setUserStreamingAccount';
+import { fetchExistingStreamingAccountItem } from './handlers/fetchExistingStreamingAccountItem';
+import { triggerUserStreamingLibraryUpdate } from './handlers/triggerUserStreamingLibraryUpdate';
+
 // https://firebase.google.com/docs/reference/admin/node?authuser=0
 // https://firebase.google.com/docs/reference/functions?authuser=0
 
@@ -28,12 +31,12 @@ const params = {
     authUri: serviceAccount.auth_uri,
     tokenUri: serviceAccount.token_uri,
     authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
-    clientC509CertUrl: serviceAccount.client_x509_cert_url
+    clientC509CertUrl: serviceAccount.client_x509_cert_url,
 }
 
 admin.initializeApp({
     credential: admin.credential.cert(params),
-    projectId: "boombox-2b90e"
+    projectId: "boombox-2b90e",
 });
 
 export class Firebase {
@@ -49,7 +52,7 @@ Sentry.init({
     tracesSampleRate: 1.0,
 });
 
-export class Logger {
+export class LogManager {
     static info = (message: string, obj: Object) => {
         ErrorManager.setContext(message, obj);
         functions.logger.log(message, obj);
@@ -82,17 +85,14 @@ export class ErrorManager {
     }
 }
 
-// Sentry.init({ dsn: generalCredentials["sentry"]["dsn"] });
-
-exports.linkStreamingAccountForUser = linkStreamingAccountForUser;
-
+exports.setUserStreamingAccount = setUserStreamingAccount;
+exports.fetchExistingStreamingAccountItem = fetchExistingStreamingAccountItem; 
+exports.triggerUserStreamingLibraryUpdate = triggerUserStreamingLibraryUpdate; 
 
 // exports.setLinkedStreamingAccountForUser = setLinkedStreamingAccountForUser
-
 // exports.fetchAppleMusicUserLibrarySongs = functions.https.onCall(async (data, _) => {
 //     return AppleMusicAPI.fetchUserLibrarySongs(data.accessToken);
 // }); 
-
 // exports.fetchAppleMusicCatalogDataForSongs = functions.https.onCall(async (data, _) => {
 //     return AppleMusicAPI.fetchCatalogDataForSongs(data.catalogIds);
 // }); 

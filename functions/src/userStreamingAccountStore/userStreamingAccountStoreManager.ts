@@ -1,11 +1,11 @@
 
-import { Firebase, ErrorManager, Logger } from '../index';
+import { Firebase, ErrorManager, LogManager } from '../index';
 import { UserStreamingAccountStoreItem, validateUserStreamingAccountStoreItem } from "./userStreamingAccountStoreTypes";
 import * as firestoreConstants from '../constants/firestoreConstants';
 
 export class UserStreamingAccountStoreManager {
     static storeAppleMusicAccountForUser = async (userUid: string, accessToken: string): Promise<UserStreamingAccountStoreItem> => {
-        Logger.info("Provided input params:", { userUid: userUid, accessToken: accessToken });
+        LogManager.info("Provided input params:", { userUid: userUid, accessToken: accessToken });
         const data = {
             userUid: userUid,
             accountType: "appleMusic",
@@ -23,5 +23,17 @@ export class UserStreamingAccountStoreManager {
             await usersLinkedStreamingAccountRef.set(data);
             return data;
         }
+    }
+
+    static fetchExistingStreamingAccount = async (userUid: string): Promise<UserStreamingAccountStoreItem | null> => {
+        const usersLinkedStreamingAccountRef = Firebase.firestoreClient.collection(firestoreConstants.UserStreamingAccountStoreCollectionKey).doc(userUid);
+        const response = await usersLinkedStreamingAccountRef.get();
+        if (response.exists) {
+            const data = response.data();
+            if (validateUserStreamingAccountStoreItem(data)) {
+                return data;
+            }
+        }
+        return null;
     }
 }

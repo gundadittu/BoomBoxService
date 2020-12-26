@@ -1,10 +1,10 @@
-import { Logger } from "..";
+import { LogManager } from "..";
 
 export type UserStreamingLibraryStoreItem = {
     isrcCodesForSongs: Array<string>;
 }
 export function validateUserStreamingLibraryStoreItem(arg: UserStreamingLibraryStoreItem | any): arg is UserStreamingLibraryStoreItem {
-    Logger.info("validateUserStreamingLibraryStoreItem() inputs:", { arg: arg });
+    LogManager.info("validateUserStreamingLibraryStoreItem() inputs:", { arg: arg });
 
     if (arg == null || arg == undefined) {
         return false;
@@ -24,6 +24,6 @@ export function validateUserStreamingLibraryStoreItem(arg: UserStreamingLibraryS
         }
     }
     const isrcCodesForSongsValidate = validateIsrcCodesForSongs();
-    Logger.info("validateUserStreamingLibraryStoreItem() outputs:", { isrcCodesForSongsValidate: isrcCodesForSongsValidate });
+    LogManager.info("validateUserStreamingLibraryStoreItem() outputs:", { isrcCodesForSongsValidate: isrcCodesForSongsValidate });
     return isrcCodesForSongsValidate
 }
