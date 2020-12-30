@@ -8,7 +8,9 @@ import * as Sentry from '@sentry/node';
 import { setUserStreamingAccount } from './handlers/setUserStreamingAccount';
 import { fetchExistingStreamingAccountItem } from './handlers/fetchExistingStreamingAccountItem';
 import { triggerUserStreamingLibraryUpdate } from './handlers/triggerUserStreamingLibraryUpdate';
-
+import { spotifyTokenSwap, spotifyRefreshTokenSwap } from './handlers/spotifyTokenSwap';
+import { SpotifyAPI } from './spotify/spotifyAPI'; 
+import { fetchStreamingLibraryForUser } from './handlers/fetchStreamingLibraryForUser';
 // https://firebase.google.com/docs/reference/admin/node?authuser=0
 // https://firebase.google.com/docs/reference/functions?authuser=0
 
@@ -88,7 +90,9 @@ export class ErrorManager {
 exports.setUserStreamingAccount = setUserStreamingAccount;
 exports.fetchExistingStreamingAccountItem = fetchExistingStreamingAccountItem; 
 exports.triggerUserStreamingLibraryUpdate = triggerUserStreamingLibraryUpdate; 
-
+exports.spotifyTokenSwap = spotifyTokenSwap
+exports.spotifyRefreshTokenSwap = spotifyRefreshTokenSwap
+exports.fetchStreamingLibraryForUser = fetchStreamingLibraryForUser; 
 // exports.setLinkedStreamingAccountForUser = setLinkedStreamingAccountForUser
 // exports.fetchAppleMusicUserLibrarySongs = functions.https.onCall(async (data, _) => {
 //     return AppleMusicAPI.fetchUserLibrarySongs(data.accessToken);
@@ -96,3 +100,6 @@ exports.triggerUserStreamingLibraryUpdate = triggerUserStreamingLibraryUpdate;
 // exports.fetchAppleMusicCatalogDataForSongs = functions.https.onCall(async (data, _) => {
 //     return AppleMusicAPI.fetchCatalogDataForSongs(data.catalogIds);
 // }); 
+exports.fetchSpotifyLibrary = functions.https.onCall(async (data, _) => {
+    return SpotifyAPI.fetchUserLibrarySongs(data.accessToken);
+}); 

@@ -5,8 +5,6 @@ import {
     AppleMusicLibrarySong,
     validateAppleMusicCatalogSong,
     AppleMusicCatalogSong,
-    DisabledAppleMusicCatalogSong,
-    validateDisabledAppleMusicCatalogSong,
 } from './appleMusicTypes';
 import { ErrorManager, LogManager } from '../index';
 
@@ -44,7 +42,7 @@ export class AppleMusicAPI {
                         'Music-User-Token': accessToken,
                     },
                 };
-                LogManager.info("Library song request config", librarySongsReqConfig); 
+                LogManager.info("Library song request config", librarySongsReqConfig);
                 let librarySongsReq = await axios(librarySongsReqConfig);
 
                 let jsonResponse = librarySongsReq.data;
@@ -55,7 +53,7 @@ export class AppleMusicAPI {
                     const errorMessage = "Apple Music API returned null/undefined response:";
                     const e = Error(errorMessage);
                     ErrorManager.reportErrorAndSetContext(e, "api response", response);
-                    throw e; 
+                    throw e;
                 }
 
                 // Update for next while iteration
@@ -89,14 +87,14 @@ export class AppleMusicAPI {
                 ErrorManager.reportErrorAndSetContext(e, "library song data", currData);
             }
         }
-        LogManager.info("AppleMusicAPI.fetchUserLibrarySongs() output:", {allSongs: allSongs});
+        LogManager.info("AppleMusicAPI.fetchUserLibrarySongs() output:", { allSongs: allSongs });
         return allSongs;
     }
 
     // Docs: https://developer.apple.com/documentation/applemusicapi/get_multiple_catalog_songs_by_id
-    static fetchCatalogDataForSongs = async (catalogIds: Array<string>): Promise<Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong>> => {
+    static fetchCatalogDataForSongs = async (catalogIds: Array<string>): Promise<Array<AppleMusicCatalogSong>> => {
         LogManager.info("AppleMusicAPI.fetchCatalogDataForSongs() inputs:", { catalogIds: catalogIds });
-        
+
         // Need to split ids into chunks of 250 (API has a max of 300 ids per request)
         const splitCatalogIds = (): Array<Array<string>> => {
             if (catalogIds == null) {
@@ -105,7 +103,7 @@ export class AppleMusicAPI {
             var allChunks: Array<Array<string>> = [];
             let chunkSize = 300;
             var ind, j;
-            for (ind = 0, j = catalogIds.length ; ind < j; ind += chunkSize) {
+            for (ind = 0, j = catalogIds.length; ind < j; ind += chunkSize) {
                 const temp: Array<string> = catalogIds.slice(ind, ind + chunkSize);
                 allChunks.push(temp);
             }
@@ -129,7 +127,7 @@ export class AppleMusicAPI {
                         Authorization: ' Bearer ' + AppleMusicAPI.musicKitDevToken,
                     },
                 };
-                LogManager.info("Catalog song request config", songReqConfig); 
+                LogManager.info("Catalog song request config", songReqConfig);
                 let songsReq = await axios(songReqConfig);
 
                 let response = songsReq.data;
@@ -157,14 +155,14 @@ export class AppleMusicAPI {
             throw e;
         }
 
-        var allSongs: Array<AppleMusicCatalogSong | DisabledAppleMusicCatalogSong> = [];
+        var allSongs: Array<AppleMusicCatalogSong> = [];
         for (var i = 0; i < allRawResponseData.length; i++) {
             console.log("validateAppleMusicCatalogSong started for item at index " + i);
             const currData = allRawResponseData[i];
             if (validateAppleMusicCatalogSong(currData)) {
                 allSongs.push(currData);
-            } else if (validateDisabledAppleMusicCatalogSong(currData)) {
-                allSongs.push(currData);
+                // } else if (validateDisabledAppleMusicCatalogSong(currData)) {
+                //     allSongs.push(currData);
             } else {
                 const errorMessage = "validateAppleMusicCatalogSong failed for:";
                 let e = Error(errorMessage);
@@ -176,4 +174,42 @@ export class AppleMusicAPI {
         LogManager.info("AppleMusicAPI.fetchCatalogDataForSongs() output:", allSongs);
         return allSongs;
     }
+
+    // static fetchRecentlyAddedLibrarySongs = async (accessToken: String): Promise<Array<AppleMusicLibrarySong>> => {
+    //     let reqConfig: AxiosRequestConfig = {
+    //         method: 'get',
+    //         baseURL: 'https://api.music.apple.com/',
+    //         url: '/v1/me/library/recently-added',
+    //         params: {
+    //             limit: 20,
+    //             include: ['catalog'] 
+    //         },
+    //         headers: {
+    //             Authorization: ' Bearer ' + AppleMusicAPI.musicKitDevToken,
+    //             'Music-User-Token': accessToken,
+    //         },
+    //     };
+    //     LogManager.info("Recently Added request config", reqConfig);
+    //     let req = await axios(reqConfig);
+
+    //     let response = req.data;
+    //     let responseValidation = response !== null || response !== undefined
+    //     if (!responseValidation) {
+    //         const errorMessage = "Apple Music API returned null/undefined response.";
+    //         let e = Error(errorMessage);
+    //         ErrorManager.reportErrorAndSetContext(e, "api response", response);
+    //         throw e;
+    //     }
+
+    //     const responseData = response.data;
+    //     let responseDataValidation = responseData !== null && responseData !== undefined
+    //     if (!responseDataValidation) {
+    //         const errorMessage = "Apple Music Catalog Songs API returned null/undefined response data body:";
+    //         const error = Error(errorMessage);
+    //         ErrorManager.reportErrorAndSetContext(error, "api response", response);
+    //         throw error; 
+    //     }
+
+
+    // }
 }

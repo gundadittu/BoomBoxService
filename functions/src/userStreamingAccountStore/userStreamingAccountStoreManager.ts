@@ -12,6 +12,23 @@ export class UserStreamingAccountStoreManager {
             appleMusicAccessToken: accessToken,
         };
 
+        const accountItem = await UserStreamingAccountStoreManager.validateAndInsertIntoDB(userUid, data);
+        return accountItem;
+    }
+
+    static storeSpotifyAccountForUser = async (userUid: string, accessToken: string): Promise<UserStreamingAccountStoreItem> => {
+        LogManager.info("Provided input params:", { userUid: userUid, accessToken: accessToken });
+        const data = {
+            userUid: userUid,
+            accountType: "spotify",
+            spotifyAccessToken: accessToken,
+        };
+
+        const accountItem = await UserStreamingAccountStoreManager.validateAndInsertIntoDB(userUid, data);
+        return accountItem;
+    }
+
+    static validateAndInsertIntoDB = async (userUid: string, data: UserStreamingAccountStoreItem | any): Promise<UserStreamingAccountStoreItem> => { 
         if (!validateUserStreamingAccountStoreItem(data)) {
             const errorMessage = "validateUserStreamingAccountStoreItem failed for:";
             let e = Error(errorMessage);

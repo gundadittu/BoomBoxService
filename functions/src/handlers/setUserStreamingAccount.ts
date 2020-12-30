@@ -32,29 +32,31 @@ export const setUserStreamingAccount = functions.https.onCall(async (data, conte
     const userUid = auth?.uid || null;
     const rawAccountType = data.accountType || null;
     const appleMusicAccessToken = data.appleMusicAccessToken || null;
-    // TODO: const spotifyAccessToken: String = data.spotifyAccessToken || null; // extract spotify credentials 
+    const spotifyAccessToken = data.spotifyAccessToken || null; // extract spotify credentials 
 
-    // TODO: compare existing and old credentials to make sure we are not doing duplicate work --> may not be needed? based on how often FE will send this requets?
 
-    if (userUid === null || rawAccountType === null || (appleMusicAccessToken === null /* && spotifyAccessToken === null */)) {
+    if (userUid === null || rawAccountType === null || (appleMusicAccessToken === null && spotifyAccessToken === null)) {
         const errorMessage = "Missing authentication and/or required parameters.";
         let e = Error(errorMessage);
         ErrorManager.reportErrorAndSetContext(e, "params", data);
         throw new functions.https.HttpsError("invalid-argument", "Missing authentication or required parameters.");
 
-        // TODO: add type check for spotify credentials 
-    } else if (typeof userUid != "string" || !validateLinkedStreamingAccountType(rawAccountType) || typeof appleMusicAccessToken !== 'string') {
+    } else if (typeof userUid != "string" || !validateLinkedStreamingAccountType(rawAccountType) || (typeof appleMusicAccessToken !== 'string' && typeof spotifyAccessToken !== 'string')) {
         const errorMessage = "Missing authentication and/or required parameters.";
         let e = Error(errorMessage);
         ErrorManager.reportErrorAndSetContext(e, "params", data);
         throw new functions.https.HttpsError("invalid-argument", "Must provide a valid type for userUid, appleMusicAccessToken, and accountType.");
 
-        // TODO: add check for spotify type and spotify credentials 
     } else if ((rawAccountType === "appleMusic" && appleMusicAccessToken === null)) {
         const errorMessage = "Missing appleMusicAccessToken.";
         let e = Error(errorMessage);
         ErrorManager.reportErrorAndSetContext(e, "params", data);
-        throw new functions.https.HttpsError("invalid-argument", "Must provide appleMusicAccess token for accountType=appleMusic.");
+        throw new functions.https.HttpsError("invalid-argument", "Must provide appleMusicAccessToken for accountType=appleMusic.");
+    } else if (rawAccountType === "spotify" && spotifyAccessToken == null) { 
+        const errorMessage = "Missing spotifyAccessToken.";
+        let e = Error(errorMessage);
+        ErrorManager.reportErrorAndSetContext(e, "params", data);
+        throw new functions.https.HttpsError("invalid-argument", "Must provide spotifyAccessToken for accountType=appleMusic.");
     }
     const type: LinkedStreamingAccountType = rawAccountType
 
@@ -64,7 +66,8 @@ export const setUserStreamingAccount = functions.https.onCall(async (data, conte
         return JSON.stringify(streamingAccount); 
     } else if (type === "spotify") {
         // TODO: implement 
-        throw Error("Spotify support not implemented yet");
+        const streamingAccount = await UserStreamingAccountStoreManager.storeSpotifyAccountForUser(userUid, spotifyAccessToken);
+        return JSON.stringify(streamingAccount); 
     }
     return JSON.stringify(null);
 });
